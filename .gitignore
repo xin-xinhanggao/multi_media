@@ -1,2 +1,7 @@
 *.bmp
 *.png
+*.jpg
+*.png
+*.pyc
+*.db
+*.txt
