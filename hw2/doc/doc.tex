@@ -1,0 +1,306 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+\usepackage{subfigure}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{图像视频大作业二}
+\begin{document}
+\maketitle
+本部分主要是对给定数据集进行检索工作，采取了不同的图象特征提取方法，也采用了不同的距离向量，对各组合下
+的结果进行了对比与分析。
+
+
+\section{Usage}
+本实验的全部代码由python编写，依赖库如下：
+
+scikit-image
+
+opencv(cv2)
+
+numpy
+
+PIL(pillow)
+
+运行时必须保证AllImages.txt和QueryImages.txt与main.py在同一目录下，运行命令为
+
+python main.py feature\_choice distance\_choice
+
+如:
+
+python main.py 242 L2 表示用242的颜色划分来获得直方图，在比较直方图的时候使用欧式距离。
+
+运行得到的结果会保存在result文件中，如result/L2 242表示242颜色划分下使用欧式距离比较直方图得到
+的分类结果。
+
+其中颜色的划分可以从[242, 484]两种中进行选择，距离的度量可以从[L2, HI, Bh, ch]四种中进行选择。
+如果遇到无法运行的问题，请联系xhg14@mails.tsinghua.edu.cn。
+
+\section{直方图}
+直方图用于描述图象在RGB空间上的特征，其中242表示将红色和蓝色分为两部分，将绿色分为四部分。同理，
+484表示将红色和蓝色分成四部分，将绿色分成八部分。由于时间复杂度和空间复杂度的限制，我们不可能将
+颜色空间分得太细，否则复杂度会直线上升。
+
+显然，直方图只能描述图象的RGB特征，对于颜色在图象上的位置对直方图的生成完全没有影响，这也是直方图
+的一个局限。
+
+\section{直方图距离的度量}
+在图象检索任务中，我们将一张图的颜色直方图作为其特征。将两张图片的相似性归于两个直方图的相似性。
+为了度量直方图之间的距离，我们引入了4种距离度量策略。
+
+\subsection{Euclidean(L2)}
+
+\begin{equation}
+d(x,y):={\sqrt  {(x_{1}-y_{1})^{2}+(x_{2}-y_{2})^{2}+\cdots +(x_{n}-y_{n})^{2}}}={\sqrt  {\sum _{{i=1}}^{n}(x_{i}-y_{i})^{2}}}
+\end{equation}
+
+这种策略将直方图的各bin的权重看成向量，比较两个向量之间的距离。
+
+\subsection{Histogram Intersection(HI)}
+
+\begin{equation}
+d(x,y) = 1 - \frac{\sum_i min(x_i, y_i)} {\sum_j y_j}
+\end{equation}
+
+可以理解为两个直方图相交的面积，HI的值越大，图象的相似度越高。
+
+\subsection{Chi-Square(ch)}
+\begin{equation}
+d(x,y) = \sum_i {\frac {{x_i - y_i} ^ 2} {x_i + y_i}}
+\end{equation}
+
+对应于distance.py中的ch函数。
+\subsection{Bhattacharyya(Bh)}
+
+\begin{equation}
+d(x,y) = \sqrt {1 - \sum \sqrt{x_iy_i}}
+\end{equation}
+
+对应于distance.py中的Bh函数。
+
+\section{实验结果以及分析}
+
+\subsection{距离度量分析}
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+
+\makecell{颜色划分} & \makecell{Bh} & \makecell{ch} & \makecell{HI} & \makecell{L2} \\ \hline
+
+\makecell{242} & \makecell{0.3975} & \makecell{0.3802} & \makecell{0.3444} & \makecell{0.3037} \\ \hline
+
+\makecell{484} & \makecell{0.4889} & \makecell{0.4778} & \makecell{0.4568} & \makecell{0.3815} \\ \hline
+
+\end{tabular}
+\caption{传统方法下各参数对分类准确率的影响.}
+\end{table}
+
+显然，由表1中的结果可知，在本测试集上，距离度量的准确率排序为Bh > ch > HI > L2。
+
+
+\begin{tabular}{|r|r|r|}
+\hline
+A & B & C \\ \hline
+\includegraphics[width=0.35\textwidth]{Image01.jpg} & \includegraphics[width=0.35\textwidth]{Image04.jpg} & \includegraphics[width=0.35\textwidth]{Image25.jpg} \\ \hline
+\end{tabular}
+
+对于L2距离来说，它仅仅考虑到了绝对距离，而没有考虑到相对距离。比如上述中的3张图象，L2会认为A与C的距离要
+近于A与B的距离，而其他算法给出的结果都相反。这主要是因为图象C中有大量的绿色所以与A图在绿色上的欧式距离
+差距比较小。但是C中出现了A中没有出现过的红色，所以C图的红色分量相对于A的红色分量距离会很大，所以针对考虑
+相对距离的度量来说，A与C的差距才能被更好得度量出来。A，B，C三张图在各个距离度量下的结果如表2所示
+
+\begin{table}
+\begin{tabular}{|r|r|r|}
+\hline
+
+\makecell{度量方法} & \makecell{A与B} & \makecell{A与C} \\ \hline
+
+\makecell{L2} & \makecell{0.0998} & \makecell{0.0894}  \\ \hline
+
+\makecell{HI} & \makecell{0.9031} & \makecell{0.8936}  \\ \hline
+
+\makecell{ch} & \makecell{0.1122} & \makecell{0.1610}  \\ \hline
+
+\makecell{Bh} & \makecell{0.1546} & \makecell{0.1608}  \\ \hline
+
+\end{tabular}
+\caption{A,B,C在各个度量下的结果.}
+\end{table}
+
+Histogram Intersection可以看成两个直方图相交的面积，一定程度上能反映两个直方图的相对误差。但也有一些
+比较特殊的情况，比如对于向量[0.4,0.4,0.4]和向量[0.6,0.3,0.3]在HI度量空间下，两向量与[0.3,0.3,0.3]
+的距离相同，但是在L2度量空间下，前者的距离要更小一些。显然，在这种情况下L2的判断更为合理一些。
+
+Bhattacharyya度量方法可以看成是Histogram Intersection的升级版，它利用乘法来考虑两个直方图的重合
+部分，如果直方图的某个bin的值很小，则必然会增大Bhattacharyya度量值。当然Bhattacharyya度量要求被
+度量向量x,y各项和为1。
+
+Chi-Square是统计学上度量两者相似性的常用策略，在样本数目越多该相似性度量越准确，对应于本实验来说，
+当颜色空间bin的数量取得很多的时候，Chi-Square统计会有很好的效果。
+
+\subsection{颜色空间划分}
+无论是242的划分方式，还是484的划分方式都选择将绿色划分地更细致一些，这主要是考虑到人眼对于绿色更为
+敏感，所以将绿色划分得更细一些有助于提升人眼对图象的辨别的能力。但是最终进行辨别任务的并不是人眼，
+而是距离度量函数，因此我对于将绿色划分得更细是否有用表示怀疑。为此，我在4种距离度量方法下测试422，242
+，224三种划分策略进行比较。
+
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+
+\makecell{颜色划分} & \makecell{Bh} & \makecell{ch} & \makecell{HI} & \makecell{L2} \\ \hline
+
+\makecell{422} & \makecell{0.3802} & \makecell{0.3704} & \makecell{0.3321} & \makecell{0.3025} \\ \hline
+
+\makecell{242} & \makecell{0.3975} & \makecell{0.3802} & \makecell{0.3444} & \makecell{0.3037} \\ \hline
+
+\makecell{224} & \makecell{0.4346} & \makecell{0.4235} & \makecell{0.3852} & \makecell{0.3247} \\ \hline
+
+\end{tabular}
+
+由实验结果可以看出，将蓝色空间划分为4份，将红色和绿色划分成两份在各个距离度量下都会有很好的效果，当然，不排除
+是由于数据的特殊性导致此结果。
+
+从划分的空间数来说，484划分的效果明显好于242的效果，但是484划分会消耗更多时间。另外，也不一定是颜色空间
+划分地越细致最终的结果就会越好，因为我们要分类的物体多少在颜色上会有一些差异性，如果划分过于仔细就会放大
+这种差异性，适得其反。
+
+\subsection{错误划分分析}
+所有种类中分类效果最差的是beach和elephant，在结果最好的484Bh里，elephants的准确率仅仅为0.15，
+beach的准确率仅仅为0.17。
+
+elephant辨别的准确率低是因为我们需要识别的三张elephant中有
+两张都是大象在草地中的图片，整个图片的主体为绿色，但是大象数据集中的绝大多图片的背景都是沙漠和土地，
+图片的主体色为黄色。与此相反的是，马的数据集中，绝大多数图片都为绿色背景（马在草地中奔跑），因此大象
+图片特别容易被识别为马。在这种情况下，仅仅依靠颜色无法识别不同的物体。可以引入图象区域划分技术，将
+原图首先划分为不同的区域，再对区域的重要性进行评估，在提取直方图的时候可以把区域重要性作为权重引入。
+
+beach的准确率低主要是因为beach数据集中有一部分只有沙滩没有大海，有些全是大海，还有些各占一半。尤其是
+全是沙滩的图片比较少，beach测试集的第一图为110.jpg，该图主要为沙滩，因此准确率非常低，第三张图113.jpg
+全是海洋，识别准确率稍微高一些。而且数据集中有些图片有人，有些图片没有人，人的肤色对我们这种依据颜色判断
+的方法也是一个很大的干扰。如果想要提高准确率的话，可以利用CNN对数据集中的图片提取特征，CNN对于局部和全局
+特征的识别都比较适合，用在这里效果应该会比较好。
+
+\section{对原有方法的改进}
+\subsection{引入距离weight}
+我们提取的图片特征即为该图片的颜色直方图，颜色直方图只能表示该图的颜色特征，不能表示其位置特征，两张
+在视觉上差异很大的图片可能拥有同样的直方图。
+
+通常我们可以认为，距离图片中心越近的像素越是重要，为此我们定义像素p(x,y)的weight为
+
+\begin{equation}
+weight(x,y) = \frac{1}{2\pi \sigma^2} e^{-((x - x_0)^2 + (y - y_0)^2)/(2 \sigma^2)}
+\end{equation}
+
+上式$(x_0, y_0)$为图象中心坐标，假定图片的重要性符合正态分布。采用不同的$\sigma$可以控制正态分布的方差，
+$\sigma$取得越大到中心点的距离对权重的影响越小。
+
+
+取$\sigma$为0.6时，可以得到各方法组合的正确率
+
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+
+\makecell{颜色划分} & \makecell{Bh} & \makecell{ch} & \makecell{HI} & \makecell{L2} \\ \hline
+
+\makecell{242} & \makecell{0.4123} & \makecell{0.4037} & \makecell{0.3568} & \makecell{0.3148} \\ \hline
+
+\makecell{484} & \makecell{0.4914} & \makecell{0.4877} & \makecell{0.4605} & \makecell{0.3926} \\ \hline
+
+\end{tabular}
+
+可以看出，在引入了距离权重之后，各方法组合正确率提升约1\%，而且这种提升与各方法的选择几乎没有关系。从
+测试集的角度来说，beach集合的准确率得到了约4\%的提升，如我们之前所说，有些beach图片是一半大海一半沙滩，
+这种情况下图片中心要么是大海要么是沙滩，不管是哪一种得到权重上的强化，都会打破两种直方图混合带来的问题，
+从而带来颜色上的提升。其余大部分测试图片也有不同程度上的提升，个别图片的正确率有轻微的下降。
+
+\subsection{引入重要性map}
+用到图片中心的距离来计算权重在有些情况下效果并不好，因为这张图片的关键因素可能并不在图片的中央，为了
+更科学地表示一张图片中各像素的重要性，我们引入Boolean Map Saliency技术来检测各像素点的重要性，
+BMS能够较好得表示出图片中物体的拓扑结构，有利于我们根据物体的种类对图片进行划分。
+
+图1表示elephants/511.jpg及其重要性灰度图，图2表示elephants/511.jpg及其重要性灰度图。
+
+\begin{figure}
+  \centering
+  \subfigure[Small Box with a Long Caption]{
+    \label{fig:subfig:a} %% label for first subfigure
+    \includegraphics[width=2.0in]{511.jpg}}
+  \hspace{1in}
+  \subfigure[Big Box]{
+    \label{fig:subfig:b} %% label for second subfigure
+    \includegraphics[width=2.0in]{511_saliency.jpg}}
+  \caption{elephants/511.jpg及其重要性灰度图}
+  \label{fig:subfig} %% label for entire figure
+\end{figure}
+
+\begin{figure}
+  \centering
+  \subfigure[Small Box with a Long Caption]{
+    \label{fig:subfig:a} %% label for first subfigure
+    \includegraphics[width=2.0in]{512.jpg}}
+  \hspace{1in}
+  \subfigure[Big Box]{
+    \label{fig:subfig:b} %% label for second subfigure
+    \includegraphics[width=2.0in]{512_saliency.jpg}}
+  \caption{elephants/511.jpg及其重要性灰度图}
+  \label{fig:subfig} %% label for entire figure
+\end{figure}
+
+从图1和图2中可以看出，大象被亮度更高的值标出，从而说明大象的重要性在这两张图片当中比较高。在引入了重要性
+map之后，可以得到各方法组合的正确率
+
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+
+\makecell{颜色划分} & \makecell{Bh} & \makecell{ch} & \makecell{HI} & \makecell{L2} \\ \hline
+
+\makecell{242} & \makecell{0.3889} & \makecell{0.3827} & \makecell{0.3704} & \makecell{0.3630} \\ \hline
+
+\makecell{484} & \makecell{0.4778} & \makecell{0.4778} & \makecell{0.4728} & \makecell{0.4432} \\ \hline
+\end{tabular}
+
+将正确率表格与原始参数下的正确率表格进行对比可以看出，不同的距离度量方法对正确率的影响很大，Bh度量下正确率反而下降了1\%，ch下几乎没有什么变化，HI下正确率提升了2\%，L2下正确率提升了5\%，这主要是因为BMP技术除了标注出主要物体之外，往往还会标注出一些背景因素，因此直方图中除了主要物体的颜色信息外，往往还会混有一些背景物体的颜色信息，在L2度量下，对于这种多出来的背景物体信息不是很敏感，因为它是一种绝对度量，而不是一种相对度量，而其他几种方法则对这种“多出来”的信息更为敏感一些，所以会导致一些误判，所以L2会表现出比其他几种度量更加优异的特点。
+
+当然，除了BMP之外还有其他重要性检测的方法，比如基于区域的检测方法可能会更好一些，但是由于本实验的主要任务是检索，所以对重要性检测方法的时间要求比较高，该方法必须要在短时间内作出重要性检测。
+
+\section{结论}
+从提高准确率的角度来说，可以将颜色集合划分得比较密集（过于密集也会影响准确率），采用484的划分方法可以说在
+时间和准确率上达到了一个折中。此外，若是采用448等将蓝色划分更密的方法会在本测试集上有很好的效果，但是在别的
+测试集上效果不一定会这么明显。引入距离权重和像素重要性也可以有效提升分类的准确率，但是距离权重对度量方法几乎没有要求，像素重要性权重对度量方法有特殊的要求，当然，可以采用一些改进的重要性检测技术来提升鉴别效果。
+\end{document}

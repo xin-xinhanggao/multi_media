@@ -1,0 +1,232 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+\usepackage{subfigure}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{图像视频大作业一 Part II}
+\begin{document}
+\maketitle
+本部分的主要工作是对lena.bmp进行DCT变换，并对变化后的DCT矩阵进行量化，考虑不同量化矩阵对量化效果的影响。
+
+
+\section{Usage}
+本部分实验全部由matlab代码编写完成，直接运行src文件夹下的exp2.m文件即可，运行时必须保证lena.bmp也在
+src文件夹下，运行完毕后会输出一系列参数，并保存一系列图片。
+
+会输出6个参数，这6个参数为分别为使用Q矩阵，Cannon矩阵和Nikon矩阵对DCT结果进行量化后的总体图片PSNR度量
+值以及各块平均度量值。并且会保存三张图片Qrecover.png，Cannonrecover.png和Nikonrecover.png，这三张
+图片为Q矩阵，Cannon矩阵和Nikon矩阵量化后的参数恢复后的图片。
+
+除此之外，还会plot一张图，该图显示了恢复后图片的总体PSNR度量值随参数a的变化结果。
+
+\section{Q矩阵量化}
+量化用的Q矩阵为
+\begin{equation}
+\begin{bmatrix}
+ 16 & 11 & 10 & 16 & 24 & 40 & 51 & 61 \\
+ 12 & 12 & 14 & 19 & 26 & 58 & 60 & 55 \\
+ 14 & 13 & 16 & 24 & 40 & 57 & 69 & 56 \\
+ 14 & 17 & 22 & 29 & 51 & 87 & 80 & 62 \\
+ 18 & 22 & 37 & 56 & 68 & 109 & 103 & 77 \\
+ 24 & 35 & 55 & 64 & 81 & 104 & 113 & 92 \\
+ 49 & 64 & 78 & 87 & 103 & 121 & 120 & 101 \\
+ 72 & 92 & 95 & 98 & 112 & 100 & 103 & 99
+\end{bmatrix}
+\end{equation}
+若我们预备进行处理的DCT参数矩阵为
+\begin{equation}
+\begin{bmatrix}
+ -415 & -33 & -58 &  35 &  58 & -51 & -15 & -12 \\
+    5 & -34 &  49 &  18 &  27 &   1 &  -5 &   3 \\
+  -46 &  14 &  80 & -35 & -50 &  19 &   7 & -18 \\
+  -53 &  21 &  34 & -20 &   2 &  34 &  36 &  12 \\
+    9 &  -2 &   9 &  -5 & -32 & -15 &  45 &  37 \\
+   -8 &  15 & -16 &   7 &  -8 &  11 &   4 &   7 \\
+   19 & -28 &  -2 & -26 &  -2 &   7 & -44 & -21 \\
+   18 &  25 & -12 & -44 &  35 &  48 & -37 & -3
+\end{bmatrix}
+\end{equation}
+则对DCT矩阵进行量化处理后可得
+\begin{equation}
+\begin{bmatrix}
+ -26 & -3 & -6 &  2 &  2 & -1 & 0 & 0 \\
+   0 & -3 & 4 &  1 &  1 &  0 & 0 & 0 \\
+  -3 &  1 &  5 & -1 & -1 &  0 & 0 & 0 \\
+  -4 &  1 &  2 & -1 &  0 &  0 & 0 & 0 \\
+   1 &  0 &  0 &  0 &  0 &  0 & 0 & 0 \\
+   0 &  0 &  0 &  0 &  0 &  0 & 0 & 0 \\
+   0 &  0 &  0 &  0 &  0 &  0 & 0 & 0 \\
+   0 &  0 &  0 &  0 &  0 &  0 & 0 & 0
+\end{bmatrix}
+\end{equation}
+从上述量化过程可知，Q矩阵主要会保留DCT矩阵的左上角，对于DCT矩阵的其余区域则有清零操作。Q矩阵进行量化操作的
+合理性在于，DCT矩阵的左上角对应于图象的低频区域，由于人眼对于图象的低频区域更为敏感，对于高频区域不够敏感，
+因此经过这种量化后的DCT矩阵依然能够还原出一张质量较高的图片。
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Qrecover.png}
+\caption{经Q矩阵量化后DCT恢复所得图.}
+\end{figure}
+
+利用Q矩阵量化DCT参数后进行还原，可得上述图象，经过与原图的对比，可以测量得恢复后的图象PSNR度量值为
+\begin{equation}
+PSNR_Q = 36.0996
+\end{equation}
+
+若对图象每一个划分小块的PSNR值进行测量并对各结果进行平均，得到的结果为
+\begin{equation}
+PSNR_{Qaverage} = 74.4811
+\end{equation}
+
+采取Q矩阵进行量化，高频部分不会完全消除，一些重要的高频信号会被保留，相对于实验part I中直接丢弃高频分量
+，Q矩阵量化从理论上和PSNR上都更优一些。
+
+\section{参数a对矩阵量化的影响}
+使用矩阵aQ对DCT结果进行量化，其中a的取值从0.1开始以0.1为单位递增直到2.0，对于DCT矩阵量化后的结果进行idct2恢复，计算恢复后图象相对于原图的PSNR值，可以得到PSNR量化图表如图2所示。
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Q-a.png}
+\caption{Q矩阵量化后恢复结果的PSNR图表.}
+\end{figure}
+从图2中可见，随着a的增加，PSNR会逐步下降。当a很小的时候，DCT量化的结果不一定能有滤去高频分量的作用，
+如此结果不能起到压缩的作用。当a很大的时候，不仅仅会滤去DCT的高频分量，还会滤去DCT的低频分量，从而
+导致PSNR下降，但是压缩比会大大增加。因此，在选取参数a的时候，需要考虑压缩比和PSNR的共同影响。
+
+另外，可以看出从0.2到0.4的信噪比会有显著下降，可以认为0.2足以能够保证画面的质量，0.4可以作为图象压缩
+的参数，从[0.2,0.4]的参数可以用于调整拍摄后照片的质量和空间。
+
+除了Q矩阵之外，还应考虑Cannon矩阵和Nikon矩阵随参数a的变化，如图3，图4所示。
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Cannon-a.png}
+\caption{Cannon矩阵量化后恢复结果的PSNR图表.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Nikon-a.png}
+\caption{Nikon矩阵量化后恢复结果的PSNR图表.}
+\end{figure}
+
+从图3和图4可以看出，不同于Q矩阵，Nikon矩阵和Cannon矩阵的图表随着a的变化会存在拐点，并不会如同Q矩阵一样随着a的增加直线下降，出现这个现象一方面是因为Nikon矩阵和Cannon矩阵在数值上都比较小，另一方面是Nikon矩阵和Cannon矩阵在高频和低频分量上的数值差异更大。因此当a比较小的时候，Nikon矩阵和Cannon矩阵不足以磨去高频分量，只能
+削弱高频分量，此时PSNR值较低，当a稍微大一些时，Nikon矩阵和Cannon矩阵可以磨去高频分量但不会过度损伤低频分量
+，因此PSNR反而会上手，当a更大的时候，高频和低频分量会一起被磨去，所以PSNR会再次下降。
+
+另外，从PSNR的角度来说，Nikon矩阵优于Cannon矩阵优于Q矩阵。
+
+从照相机的角度来说Nikon矩阵和Cannon矩阵都有两个极小值，在不能将a值调低获得高PSNR的情况下，可以使a值在两个
+极小值之间调节，从而获得不错的图片质量（从PSNR角度来说），也能获得不错的压缩比。
+\section{设计量化矩阵需要考虑的因素}
+需要考虑待处理图像的类型，不同类型的图像高频与低频的成分不同，因此设计量化矩阵时应该注意待处理图像的类型。比如天文类的图像和柔和的自然景观图要分别设计量化矩阵。
+
+还需要考虑应用的场景，我们之前接触的Nikon矩阵和Cannon矩阵是用来给照相机使用的，Q矩阵则是计算机压缩图象
+成jpeg格式时使用的，自然会不相同。
+
+此外还需要考虑压缩比，针对不同的压缩比，设计的量化矩阵不同，如果要求的压缩比小一些，可以多保留一些分量来
+保障图片质量。
+
+关于量化矩阵的设计，我查到一种基于Q矩阵的改进策略。设原本的量化矩阵为Qbase(即我们之前使用的Q)，引入质量参数quality，0表示质量最差，100表示质量最好。
+
+计算新矩阵$Q_{new}$的方式如下：
+
+1.定义S，if (Q < 50), then S = 5000/Q, else S = 200 – 2*Q.
+
+2.$Q_{new}$的规模与Qbase相同，$Q_{new}$在(i,j)处的元素可以确定为
+\begin{equation}
+Q_{new}[i,j] = floor((S * Qbase[i,j] + 50) / 100)
+\end{equation}
+
+如果Q = 50，则我们得到的$Q_{new}$与原来的Q完全相同，因此，我们可以设置不同的Q来获取不同质量的图片，当然
+当Q取大一些的时候，恢复图片的PSNR更高，但是压缩比更低，如果Q小一些，PSNR会变小，但是压缩比会增大。
+
+还有一种基于机器学习的方法可以用于量化矩阵的求取，可以对于需要压缩的某一类图象，训练Q矩阵，根据相同压缩比
+下的PSNR来作为神经网络的loss，最终可以获得专门适配于训练集的Q矩阵。但是用这个方法得到Q矩阵消耗时间比较长，
+而且Q矩阵的通用性不高，往往只能用到某一类图象，而且神经网络容易得到极大值而不是最大值，这也是一个隐患。
+\section{Nikon矩阵和Cannon矩阵的应用}
+将Nikon矩阵和Cannon矩阵应用在lena.bmp上，可以得到两者的全局PSNR和平均PSNR为
+\begin{equation}
+PSNR_{Cannon} = 49.6190
+\end{equation}
+
+\begin{equation}
+PSNR_{Cannonaverage} = 87.7596
+\end{equation}
+
+\begin{equation}
+PSNR_{Nikon} = 51.1356
+\end{equation}
+
+\begin{equation}
+PSNR_{Nikonaverage} = 88.8013
+\end{equation}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Cannonrecover.png}
+\caption{经Cannon矩阵量化后DCT恢复所得图.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{Nikonrecover.png}
+\caption{经Nikon矩阵量化后DCT恢复所得图.}
+\end{figure}
+
+
+从lena.bmp的实验结果可以看出，Nikon矩阵的信噪比高于Cannon矩阵和Q矩阵。
+
+另外，我选取了几个比较有特点的图片进行信噪比的测量，以下所说的信噪比都是指全局的PSNR度量，而不是针对块平均PSNR度量。选取的图片中，图片A和图片B都是清晰图像，图片C是景深图像，有一部分清晰，有一部分模糊，图片D则是模糊图像，各图在Nikon矩阵和Cannon矩阵量化后的PSNR度量值如表1所示。
+
+\begin{table}
+\begin{tabular}{|r|r|r|r|r|}
+\hline
+\makecell{度量矩阵} & \makecell{A} & \makecell{B} & \makecell{C} & \makecell{D}\\ \hline
+
+\makecell{} & \includegraphics[width=0.22\textwidth]{test1.png} & \includegraphics[width=0.22\textwidth]{test2.png} & \includegraphics[width=0.22\textwidth]{test3.png} & \includegraphics[width=0.22\textwidth]{test4.png}\\ \hline
+Cannon & 51.77 & 53.34 & 53.89 & 59.94 \\ \hline
+Nikon & 52.73 & 54.17 & 54.33 & 59.82 \\ \hline
+\end{tabular}
+\caption{不同矩阵度量下各图的PSNR.}
+\end{table}
+
+由表1结果可以看出，Nikon矩阵在清晰图像上的效果强于Cannon矩阵量化后的效果，但对于带有景深的图像来说两者差距变小，对于像D那样的模糊图像，两者几乎没有差距。
+\end{document}
+

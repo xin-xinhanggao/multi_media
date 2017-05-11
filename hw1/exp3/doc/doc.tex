@@ -1,0 +1,205 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{图像视频大作业一 Part III}
+\begin{document}
+\maketitle
+本部分实验是针对视频的运动物体检测，我从视频中截取了10帧以图象格式存储，相邻的帧间隔1秒，存储于src/img文件夹中，作为运动物体检测的原材料。
+
+\section{Usage}
+本实验由matlab编码完成，在exp3/src下直接运行exp3.m即可，运行的时候必须保证img文件夹在同一目录，
+而且result文件夹也应该在这一目录(result可以是空文件夹，用于接收运动检测结果)。
+
+输出结果为9个参数，前4个为使用pixel matching在保留1，$\frac{1}{4}$，$\frac{1}{16}$，
+$\frac{1}{64}$比例的参数时进行匹配的平均MSE，后4个为使用DCT matching在保留1，$\frac{1}{4}$，$\frac{1}{16}$，$\frac{1}{64}$比例的参数时进行匹配的平均MSE。如64 dct match :296.4349表示保留$\frac{1}{64}$的参数进行匹配时各图的平均MSE，最后一个参数为Haar小波匹配结果的MSE。
+
+最后还会plot两张图，表示两种方法下各帧MSE随帧数的变化。
+
+\section{Pixel Match}
+Pixel match的原理为在给定位置的邻域内，对所有16 * 16的像素块进行遍历，寻找在欧式距离意义下与原运动部分最
+接近的像素块。
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|}
+\hline
+
+1 \includegraphics[width=0.35\textwidth]{pixelmatch1.png} & 2\includegraphics[width=0.35\textwidth]{pixelmatch2.png} & 3\includegraphics[width=0.35\textwidth]{pixelmatch3.png} \\ \hline
+
+4\includegraphics[width=0.35\textwidth]{pixelmatch4.png} & 5\includegraphics[width=0.35\textwidth]{pixelmatch5.png} & 6\includegraphics[width=0.35\textwidth]{pixelmatch6.png} \\ \hline
+
+7\includegraphics[width=0.35\textwidth]{pixelmatch7.png} & 8\includegraphics[width=0.35\textwidth]{pixelmatch8.png} & 9\includegraphics[width=0.35\textwidth]{pixelmatch9.png} \\ \hline
+
+\end{tabular}
+\caption{Pixel matching在各帧上的结果(用黑色标出).}
+\end{table}
+表1中列出了各张图片标出运动物体的结果。
+
+各帧MSE随帧数的变化图如图1所示。
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{pixel_plot.png}
+\caption{Pixel Match下各帧MSE随帧数变化.}
+\end{figure}
+
+\section{Dct Match}
+Compression domain block matching的原理是在给定位置的邻域内，对所有16 * 16的像素块进行遍历，对比每个
+像素块DCT之后的结果与原运动部分的距离，寻找距离最短的像素块。
+
+表2中列出了各张图片标出运动物体的结果。
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|}
+\hline
+
+1 \includegraphics[width=0.35\textwidth]{dctmatch1.png} & 2\includegraphics[width=0.35\textwidth]{dctmatch2.png} & 3\includegraphics[width=0.35\textwidth]{dctmatch3.png} \\ \hline
+
+4\includegraphics[width=0.35\textwidth]{dctmatch4.png} & 5\includegraphics[width=0.35\textwidth]{dctmatch5.png} & 6\includegraphics[width=0.35\textwidth]{dctmatch6.png} \\ \hline
+
+7\includegraphics[width=0.35\textwidth]{dctmatch7.png} & 8\includegraphics[width=0.35\textwidth]{dctmatch8.png} & 9\includegraphics[width=0.35\textwidth]{dctmatch9.png} \\ \hline
+
+\end{tabular}
+\caption{Dct matching在各帧上的结果(用黑色标出).}
+\end{table}
+
+各帧MSE随帧数的变化图如图2所示。
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{dct_plot.png}
+\caption{Dct Match下各帧MSE随帧数变化.}
+\end{figure}
+
+\section{Pixel Match与Dct Match的对比}
+从图1和图2可以看出，两者在各个帧下的结果几乎完全一致，MSE图也几乎一致。但理论上来说，在保留所有参数的情况
+下pixel match的性能应该能在MSE的考量下达到最优。
+
+虽然像素序列可以和DCT序列相互转化，并且具有唯一性，但是由于数值精度的原因，使用像素序列匹配的结果应该在
+MSE指标下优于DCT后进行比较的结果。在本次实验中我选取了小车的中部，可以看出两个匹配都找出了小车的中部，但
+这也归功于16 * 16的小块和小车的尺寸比较吻合，所以干扰比较小。
+
+如果我们只选取部分参数进行匹配，对进行匹配的9个帧的MSE的平均值进行比较，可以获得
+
+\begin{tabular}{|r|r|r|}
+\hline
+\makecell{保留比例} & \makecell{Pixel Match} & \makecell{Dct Match} \\ \hline
+
+\makecell{1} & \makecell{270.54} & \makecell{270.54} \\ \hline
+
+\makecell{$\frac{1}{4}$} & \makecell{293.15} & \makecell{270.54} \\ \hline
+
+\makecell{$\frac{1}{16}$} & \makecell{295.85} & \makecell{276.97} \\ \hline
+
+\makecell{$\frac{1}{64}$} & \makecell{8777.36} & \makecell{302.14} \\ \hline
+\end{tabular}
+
+可以看出，当丢弃一些数据进行匹配的时候DCT开始展示出明显的优势，在这种情况下DCT得到的结果将更
+符合运动物体运动轨迹，而pixel match已经开始出现明显错误。当然，这一结果也与我们的丢失策略有
+关系，在本实验中，我丢失DCT参数时集中丢弃了高频分量，所以对结果的影响不是很大。对于Pixel
+匹配，我采用的方式是隔若干行若干列保留一个像素点。
+
+表3和表4列出了仅仅保留$\frac{1}{64}$参数的情况下Pixel匹配和DCT匹配的差异。
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|}
+\hline
+
+1 \includegraphics[width=0.2\textwidth]{6pixelmatch1.png} & 2\includegraphics[width=0.2\textwidth]{6pixelmatch2.png} & 3\includegraphics[width=0.2\textwidth]{6pixelmatch3.png} \\ \hline
+
+4\includegraphics[width=0.2\textwidth]{6pixelmatch4.png} & 5\includegraphics[width=0.2\textwidth]{6pixelmatch5.png} & 6\includegraphics[width=0.2\textwidth]{6pixelmatch6.png} \\ \hline
+
+7\includegraphics[width=0.2\textwidth]{6pixelmatch7.png} & 8\includegraphics[width=0.2\textwidth]{6pixelmatch8.png} & 9\includegraphics[width=0.2\textwidth]{6pixelmatch9.png} \\ \hline
+
+\end{tabular}
+\caption{保留$\frac{1}{64}$参数时Pixel matching结果.}
+\end{table}
+
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|}
+\hline
+
+1 \includegraphics[width=0.2\textwidth]{6dctmatch1.png} & 2\includegraphics[width=0.2\textwidth]{6dctmatch2.png} & 3\includegraphics[width=0.2\textwidth]{6dctmatch3.png} \\ \hline
+
+4\includegraphics[width=0.2\textwidth]{6dctmatch4.png} & 5\includegraphics[width=0.2\textwidth]{6dctmatch5.png} & 6\includegraphics[width=0.2\textwidth]{6dctmatch6.png} \\ \hline
+
+7\includegraphics[width=0.2\textwidth]{6dctmatch7.png} & 8\includegraphics[width=0.2\textwidth]{6dctmatch8.png} & 9\includegraphics[width=0.2\textwidth]{6dctmatch9.png} \\ \hline
+
+\end{tabular}
+\caption{保留$\frac{1}{64}$参数时Dct matching的结果.}
+\end{table}
+
+\clearpage
+\section{其他匹配算法--Haar小波匹配算法}
+在src/haarmatch.m中我实现了haar小波匹配算法，与DCT不同的是，我们不再求16 * 16小块的DCT变换，转
+而求每个小块的二维haar小波变换。在matlab中，haar小波变换可以直接调用库函数
+
+\begin{equation}
+[a,h,v,d] = haart2(x)
+\end{equation}
+针对16*16的二维块，其结果中a为一个实数，h包含一个8*8的矩阵，一个4 * 4的矩阵，一个2*2的矩阵和一个实数，v、d与h的规模相同。可以从其中选取某些参数作为我们的比较因子。
+
+在本实验中，我选取了4个实数作为一个16*16二维块的特征，来与之前$\frac{1}{64}$比例的参数进行对比。
+对比后的结果显示在表5中。
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|}
+\hline
+
+1 \includegraphics[width=0.2\textwidth]{haarmatch1.png} & 2\includegraphics[width=0.2\textwidth]{haarmatch2.png} & 3\includegraphics[width=0.2\textwidth]{haarmatch3.png} \\ \hline
+
+4\includegraphics[width=0.2\textwidth]{haarmatch4.png} & 5\includegraphics[width=0.2\textwidth]{haarmatch5.png} & 6\includegraphics[width=0.2\textwidth]{haarmatch6.png} \\ \hline
+
+7\includegraphics[width=0.2\textwidth]{haarmatch7.png} & 8\includegraphics[width=0.2\textwidth]{haarmatch8.png} & 9\includegraphics[width=0.2\textwidth]{haarmatch9.png} \\ \hline
+
+\end{tabular}
+\caption{保留$\frac{1}{64}$参数时Haar matching的结果.}
+\end{table}
+该结果的平均MSE为
+\begin{equation}
+MSE_{har} = 572.67
+\end{equation}
+从MSE的度量结果来看haar匹配的方法要略弱于DCT匹配的方法，但是从人眼视觉的角度来说，这两者几乎没有差别，另外在仅仅保留部分参数的情况下，haar方法容易产生方形像素块，我们要检测的目标也正好是16 * 16的像素块，在一定程度
+上影响了haar match的结果，如果检测的目标变为其他形状应该会得到更好的结果。另外，haar参数的选择也可以有其他
+的策略，可以匹配出更好的结果。
+\end{document}
+

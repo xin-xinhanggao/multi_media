@@ -1,0 +1,279 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+\usepackage{subfigure}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{图像视频大作业一 Part I}
+\begin{document}
+\maketitle
+本部分的主要工作是对lena.bmp进行灰度变换和DCT变换，并分析几种DCT变换的区别，用PSNR度量变换前后的影响。
+
+
+\section{Usage}
+本部分实验全部由matlab代码编写完成，直接运行src文件夹下的exp1.m文件即可，运行时必须保证lena.bmp也在
+src文件夹下，运行完毕后会输出一系列参数，并保存一系列图片。
+
+输出参数中，首先会输出3种DCT变换方法对应的时间和恢复前后的PSNR度量值，并且3种DCT变换恢复后的结果会以
+图片的格式存储下来，如recover2DCT.bmp表示二维DCT变换后恢复的结果（即matlab中的dct2命令)。随后会
+将原有的参数进行抽取，仅仅保留三种方法中参数的$\frac{1}{4}$，$\frac{1}{16}$，$\frac{1}{64}$，并利用
+剩余参数进行恢复。此时会输出在此三种比例下恢复结果的PSNR度量值，也会将恢复的结果以图片的形式保留下来，如
+'max\_1D\_reserve\_0.015625.bmp'表示两次1维压缩后的参数保留$\frac{1}{64}$恢复得到的结果，其中max表示选择DCT参数中前K大的参数进行保留。
+
+\section{灰度化}
+灰度化的原理为将RGB空间转化到YIQ空间，并且最终只保留亮度参数Y作为最终输出。转化公式为
+\begin{equation}
+  Y = 0.3R + 0.59G + 0.11B
+\end{equation}
+
+灰度化结果为
+
+\begin{figure}  
+\begin{minipage}[t]{0.5\linewidth}  
+\centering  
+\includegraphics[width=2.2in]{lena.png}  
+\caption{原图}  
+\label{fig:side:a}  
+\end{minipage}%  
+\begin{minipage}[t]{0.5\linewidth}  
+\centering  
+\includegraphics[width=2.2in]{gray.png}  
+\caption{灰度图}  
+\label{fig:side:b}  
+\end{minipage}  
+\end{figure} 
+
+\section{PSNR}
+PSNR用来度量两张图的相似性，其计算方式为
+\begin{equation}
+PSNR = 10log_{10} \frac {{255} ^ 2}  {MSE} 
+\end{equation}
+
+\begin{equation}
+MSE = \frac {\sum_{n = 1}{Framesize} {(I_n - P_n)}^2} {Framesize}
+\end{equation}
+\section{DCT变换}
+\subsection{两次一维DCT变换}
+
+一维DCT变换的原理如下，针对给定序列f(x)，其DCT正变换和逆变换为
+\begin{equation}
+F(u) = \sqrt{\frac {2} {N}} C(u) \sum_{x = 0}^{N - 1}f(x) \cos {\frac{(2x + 1)u} {2N} \pi}
+\end{equation}
+
+\begin{equation}
+f(x) = \sqrt{\frac {2} {N}}\sum_{u = 0}^{N - 1}C(u)F(u) \cos {\frac{(2x + 1)u} {2N} \pi}
+\end{equation}
+
+在这种形式下，我们先对原图的行作DCT变换，再对第一步结果的列作DCT变换。
+
+对于一个长度为N的序列进行一次DCT变换需要$N^2$次运算，对一个二维图像进行两次一维DCT变换，即需要对2N个
+序列进行DCT变换，因此该方法的时间复杂度为
+
+\begin{equation}
+N^2 * 2N = 2N^3 = O(N^3)
+\end{equation}
+
+在matlab中，这个命令实际的操作时间为0.034277秒。
+
+使用idct2对使用本方法DCT后的参数进行恢复，得到的恢复图为
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{recover1DCT.png}
+\caption{idct2恢复两次一维DCT变换的结果.}
+\end{figure}
+
+该恢复图像与原图相比的PSNR度量结果为
+\begin{equation}
+PSNR_{1DCT} = 312.8633
+\end{equation}
+\subsection{二维DCT变换}
+二维DCT变换的原理如下，针对给定序列f(i,j)，其DCT正变换和逆变换如下
+
+\begin{equation}
+F(u, v) = {\frac {2} {N}} C(u) C(v) \sum_{i = 0}^{N - 1} \sum_{j = 0}^{N - 1}f(i,j) \cos {\frac{(2i + 1)u} {2N} \pi} \cos {\frac{(2j + 1)u} {2N} \pi}
+\end{equation}
+
+\begin{equation}
+f(i,j) = {\frac {2} {N}}\sum_{u = 0}^{N - 1}\sum_{v = 0}^{N - 1}C(u)C(v)F(u,v) \cos {\frac{(2i + 1)u} {2N} \pi}\cos {\frac{(2j + 1)v} {2N} \pi}
+\end{equation}
+由上述公式可以看出，计算F(u,v)中每一个元素需要$N^2$次运算，整张图有$N^2$个元素，
+因此该方法的时间复杂度为
+
+\begin{equation}
+N^2 * N ^ 2 = N^4 = O(N^4)
+\end{equation}
+
+在matlab中，这个命令实际的操作时间为0.026376秒。
+
+使用idct2对使用本方法DCT后的参数进行恢复，得到的恢复图为
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{recover2DCT.png}
+\caption{idct2恢复二维DCT变换的结果.}
+\end{figure}
+
+该恢复图像与原图相比的PSNR度量结果为
+\begin{equation}
+PSNR_{2DCT} = 312.7920
+\end{equation}
+
+\subsection{分块二维DCT变换}
+分块DCT变换的思路是，首先将原图划分为若干个$k * k$的小块，对每个小块进行二维DCT变换，将各小块DCT的结果拼合
+成一个原图规模的矩阵，即为此方法下DCT的结果。
+
+在这一方法下，我们仍有$N^2$个DCT元素需要计算，但是计算每个元素时只需要$k^2$次运算，因此该方法的时间复杂度为
+
+\begin{equation}
+N^2 * k ^ 2 = N^2 k ^ 2 = O(N^2k^2)
+\end{equation}
+在matlab中，这个命令实际的操作时间为0.554612秒。
+
+使用idct2对使用本方法DCT后的参数进行恢复，得到的恢复图为
+
+\begin{figure}
+\centering
+\includegraphics[width=0.7\textwidth]{recover8*82DCT.png}
+\caption{idct2恢复分块二维DCT变换的结果.}
+\end{figure}
+
+该恢复图像与原图相比的PSNR度量结果为
+\begin{equation}
+PSNR_{8*8 2DCT} = 313.8932
+\end{equation}
+
+\clearpage
+\section{DCT变换的时间复杂度和PSNR}
+\begin{table}
+\begin{tabular}{|r|r|r|r|}
+\hline
+\makecell{度量方法} & \makecell{一维DCT} & \makecell{二维DCT} & \makecell{分块二维DCT} \\ \hline
+
+PSNR & 312.8633 & 312.7920 & 313.8932 \\ \hline
+时间复杂度 & $2N^3$ & $N^4$ & $N^2k^2$ \\ \hline
+实际耗时(s) & 0.034277 & 0.026376 & 0.554612 \\ \hline
+\end{tabular}
+\caption{各方法的时间以及性能比较.}
+\end{table}
+从表格1中可以看出，三种方法在PSNR度量下的效果几乎一致。实际上二维DCT应该最能表达整张图象在二维频域下的
+信息，但是其他两种方法也能在一定程度上表明该图象的频域特征，另一方面由于我们采用了全部的DCT信息进行恢复，
+在这种情况下对三种方法的结果要求不是很高，在下一节中，仅仅保留部分DCT参数来恢复图像，这就为DCT参数的质量
+提出了更高的要求。
+
+另一个值得关注的问题是，算法的时间复杂度与实际运行时间并不一致。导致这一原因的是matlab的一些特性，在计算
+分块二维DCT时，由于我们需要手动遍历各个区域块，而matlab对循环操作非常不友好，会导致循环的速度很慢，也就
+造成了二维DCT耗时最长的特点。二维DCT快于一维DCT主要是因为matlab对于矩阵的运算更加亲近，会快于对矩阵中
+向量的操作，而且在matlab里从一个矩阵中提取向量的效率也不够可观，所以造成了现在我们看到的实际运行时间。
+
+从理论层面上来说，二维DCT耗时最久，一般来说使用分块二维DCT更为合理，可以根据自己的需要调节k的大小，显然
+当k = N时，分块二维DCT会退化为二维DCT。
+
+\section{保留部分参数}
+出于节省空间的目的，我们尝试仅仅保留3种方法DCT参数的$\frac{1}{4}$，$\frac{1}{16}$，$\frac{1}{64}$
+来恢复原图像，比较不同方法下的结果，并分析原因。
+
+首先，我们面临的第一个问题是如何选取要保留的DCT参数，我提供了两种实现，分别对应于src文件夹下的choose\_first\_coe.m和choose\_max\_coe.m。一种方法是基于人眼的特征来考虑，人眼对于高频分量不够敏感，对于低频分量更加
+敏感，因此我们保留一张图片DCT参数的左上角。同时，我们若将图片的DCT分量打印出来，可以发现图片的左上角以外的
+区域DCT分量几乎为0，这是保留左上角DCT分量的另一个依据。另一种方法是保留DCT分量中较大的那些，对DCT分量的绝对值从大到小进行排序，保留排序后结果最大的前x个分量。
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|r|}
+\hline
+\makecell{保留比例} & \makecell{一维DCT} & \makecell{二维DCT} & \makecell{分块二维DCT} \\ \hline
+
+$\frac{1}{4}$ & \includegraphics[width=0.25\textwidth]{first_1D_reserve_0.25.png} & \includegraphics[width=0.25\textwidth]{first_2D_reserve_0.25.png} & \includegraphics[width=0.25\textwidth]{first_2D8*8_reserve_0.25.png} \\ \hline
+$\frac{1}{16}$ & \includegraphics[width=0.25\textwidth]{first_1D_reserve_0.0625.png} & \includegraphics[width=0.25\textwidth]{first_2D_reserve_0.0625.png} & \includegraphics[width=0.25\textwidth]{first_2D8*8_reserve_0.0625.png} \\ \hline
+$\frac{1}{64}$ & \includegraphics[width=0.25\textwidth]{first_1D_reserve_0.015625.png} & \includegraphics[width=0.25\textwidth]{first_2D_reserve_0.015625.png} & \includegraphics[width=0.25\textwidth]{first_2D8*8_reserve_0.015625.png} \\ \hline
+\end{tabular}
+\caption{保留左上角参数恢复后图片比较.}
+\end{table}
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|r|}
+\hline
+\makecell{保留比例} & \makecell{一维DCT} & \makecell{二维DCT} & \makecell{分块二维DCT} \\ \hline
+
+$\frac{1}{4}$ &36.2345& 36.2345 & 34.8839\\ \hline
+$\frac{1}{16}$ &29.9222& 29.9222 & 28.2162\\ \hline
+$\frac{1}{64}$ &25.8642& 25.8642 & 23.6717 \\ \hline
+\end{tabular}
+\caption{保留左上角参数恢复后的PSNR指标.}
+\end{table}
+
+如表2和表3所示，一维DCT的效果与二维DCT的效果在保留左上角参数时基本相同，这两个方法的结果优于8*8分块的DCT方法，
+从图象上来看，当删除元素的比例增加时8*8分块的方法开始出现锯齿，而前两个方法并没有出现锯齿现象。另一方面
+8*8分块的DCT方法对应的PSNR也更低一些。
+
+另一方面，我们对比选取最大元素保留的结果
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|r|}
+\hline
+\makecell{保留比例} & \makecell{一维DCT} & \makecell{二维DCT} & \makecell{分块二维DCT} \\ \hline
+
+$\frac{1}{4}$ & \includegraphics[width=0.25\textwidth]{max_1D_reserve_0.25.png} & \includegraphics[width=0.25\textwidth]{max_2D_reserve_0.25.png} & \includegraphics[width=0.25\textwidth]{max_2D8*8_reserve_0.25.png} \\ \hline
+$\frac{1}{16}$ & \includegraphics[width=0.25\textwidth]{max_1D_reserve_0.0625.png} & \includegraphics[width=0.25\textwidth]{max_2D_reserve_0.0625.png} & \includegraphics[width=0.25\textwidth]{max_2D8*8_reserve_0.0625.png} \\ \hline
+$\frac{1}{64}$ & \includegraphics[width=0.25\textwidth]{max_1D_reserve_0.015625.png} & \includegraphics[width=0.25\textwidth]{max_2D_reserve_0.015625.png} & \includegraphics[width=0.25\textwidth]{max_2D8*8_reserve_0.015625.png} \\ \hline
+\end{tabular}
+\caption{保留前k大参数恢复后图片比较.}
+\end{table}
+
+\begin{table}
+\Large 
+\begin{tabular}{|r|r|r|r|}
+\hline
+\makecell{保留比例} & \makecell{一维DCT} & \makecell{二维DCT} & \makecell{分块二维DCT} \\ \hline
+
+$\frac{1}{4}$ &40.0671& 40.0671 & 40.3899\\ \hline
+$\frac{1}{16}$ &32.4749& 29.9222 & 30.4301\\ \hline
+$\frac{1}{64}$ &27.7887& 27.7887 & 23.6717 \\ \hline
+\end{tabular}
+\caption{保留前k大参数恢复后的PSNR指标.}
+\end{table}
+
+对比表3和表5的结果，保留前K大参数时，可以看出一维DCT和二维DCT的效果基本相同，分块二维DCT在仅仅保留$\frac{1}{64}$比例的参数时
+会出现锯齿现象，而且PSNR指标会略微低一些。
+
+但是在保留$\frac{1}{16}$比例的参数时，一维DCT和分块二维DCT的效果相比于仅仅保留左上角要好一些，这是因为左上角的元素不一定都是关键元素，也可能有0元素的干扰。保留前k大参数相较于保留左上角元素在PSNR的度量下效果会更好
+一些，但是保留前k大参数需要对元素进行排序，增大了时间复杂度，在实际应用中应该根据实际需求进行选择。
+
+\end{document}
+
