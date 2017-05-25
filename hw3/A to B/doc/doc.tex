@@ -1,0 +1,89 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+\usepackage{subfigure}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{音频转换实验 Part II}
+\begin{document}
+\maketitle
+本部分设计到对5个音频的转化，使用的工具是matlab straight，转化后的结果存储在result文件夹里，
+都以new开头命名，比如newAsen6000.wav表示A文件夹下的sen6000.wav转化后的结果。
+
+\section{各个音频转化时的参数设置}
+
+\begin{tabular}{|r|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{基频调整} & \makecell{频率调整}\\ \hline
+
+\makecell{sen6000.wav} & \makecell{1.9953} & \makecell{1.2535}\\ \hline
+
+\makecell{sen6015.wav} & \makecell{2.062} & \makecell{1.2535}\\ \hline
+
+\makecell{sen6028.wav} & \makecell{2.062} & \makecell{1.2535}\\ \hline
+
+\makecell{sen6044.wav} & \makecell{2.062} & \makecell{1.2535}\\ \hline
+
+\makecell{sen6147.wav} & \makecell{1.8682} & \makecell{1.2535}\\ \hline
+\end{tabular}
+
+
+从表中可以看出，几乎所有文件都仅仅通过调整基频和频率就可以把男性的声音转化成女性的声音，而且这些参数十分相近，这主要
+是因为所有A类文件的音色，音速和音调基本相同，只是内容不一样，B类文件也是如此，仅仅有内容上的差别。
+
+
+A类文件的基频相对于B类文件来说要低一些，频率相对于B类文件来说也会低一些，但是两者的时长是基本一样的，所以在进行调整
+的时候我主要是对基频和频率进行了调整。图1以A/sen6000.wav为例显示A类文件analysis的结果，图2以B/sen6000.wav为例
+显示了B类文件analysis的结果。
+
+另一个有趣的问题是，如果把B转化成A，该怎么设置参数，通过实验发现，几乎可以当前操作的逆操作，即降低基频并且降低频谱。
+降低的幅度取当前提升幅度的倒数即可。这也说明了我们目前的转化操作是可逆的。
+\begin{figure}
+\centering
+\includegraphics[width=1.0\textwidth]{Asen6000.png}
+\caption{A/sen6000.wav analysis结果.}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=1.0\textwidth]{Bsen6000.png}
+\caption{B/sen6000.wav analysis结果.}
+\end{figure}
+\end{document}
+
