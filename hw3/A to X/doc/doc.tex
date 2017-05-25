@@ -1,0 +1,88 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+\usepackage{subfigure}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{音频转换实验 Part I}
+\begin{document}
+\maketitle
+本部分实验的主要目的是将两段音频分别转换成3段不同的音频，并对新生成的音频进行分析。在对音频进行处理
+的时候，我采用了控制变量的思路，即每次只改变频率，基频和时长中的一个因素。生成的结果在result文件夹里，
+分别对应改变基频，改变频率，改变时长三个因素中的一个。
+
+\begin{figure}  
+\begin{minipage}[t]{0.5\linewidth}  
+\centering  
+\includegraphics[width=2.2in]{guodegang.png}  
+\caption{guodegang.wav分析结果}  
+\label{fig:side:a}  
+\end{minipage}%  
+\begin{minipage}[t]{0.5\linewidth}  
+\centering  
+\includegraphics[width=2.2in]{shantianfang.png}  
+\caption{shantianfang.wav分析结果}  
+\label{fig:side:b}  
+\end{minipage}  
+\end{figure} 
+
+我使用的工具为matlab straight，两个音频文件analysis的结果如图1所示。
+
+\section{改变基频}
+基频对应于声学特征中的音高特性。将基频提高到原来的2.028倍可以得到相应的音频文件guodegang\_2.028.wav
+和shantianfang\_2.028.wav存储于result/改变基频下。
+
+从人耳的角度来说，提高基频后的声音音调更高，郭德纲的声音显得有些娘娘腔，
+但是仍然可以分辨出这是男性的声音。单田芳的声音音调也随之提高，但是感觉浊音更重一些。
+
+\section{改变频率}
+频率对应于声学特征中的音色特性。此时我们将郭德纲的声音频率提高到原来的1.1251倍，将单田芳的声音频率提高到原来的2.2914倍，相应
+的音频文件存储在result/改变频率下。
+
+从人耳的角度来说，郭德纲的声音提高1.1251倍后变得更加尖亮，有些接近于单田芳原来的声音，依然可以辨别出这是男性的声音。单田芳的声音
+频率提高到原来的2.2914倍后虽然可以听清楚音频的内容，但是已经分不清这是男性的声音还是女性的声音，有些接近于魔音通话的匿名音。
+
+\section{改变时长}
+时长对应于声学特征中的音速特性。将郭德纲音频的时长变为原来的1.5336倍，将单田芳音频的时长变为原来的0.629倍，相应
+的音频文件存储在result/改变时长下。
+
+时长的改变首先会改变原音频文件的大小。另一方面，对于时长变大的音频文件，内容依然可以听清，但是声音更加低沉，略微显得有些中气不足。
+对于时长变短的音频文件，声音会变得尖锐，与提高频率与相似的特点，从这个角度来说，或许降低时长的同时降低频率能够对原音频起到“保真”
+的作用。
+\end{document}
+
