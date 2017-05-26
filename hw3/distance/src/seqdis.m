@@ -1,6 +1,4 @@
 function [ dis ] = seqdis( namea, nameb )
-%SDIS Summary of this function goes here
-%   Detailed explanation goes here
 
 [stream_a, a_sample_rate] = audioread(namea);
 [stream_b, b_sample_rate] = audioread(nameb);
@@ -29,10 +27,7 @@ for i = 1 : abs(lena - lenb)+1
     if MSE < minMSE
         minMSE = MSE;
     end
-end
-
-%MSE=sum((fft_a - fft_b).^2)/(asrate);     
-%PSNR=10*log10((255*255)/abs(MSE))      
+end  
 
 dis = minMSE;
 

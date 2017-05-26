@@ -1,0 +1,274 @@
+\documentclass{ctexart}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{makecell}
+\usepackage{subfigure}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ %
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}; should come as last argument
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,	                   % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  keywordstyle=\color{blue},       % keyword style
+  language=Octave,                 % the language of the code
+  morekeywords={*,...},           % if you want to add more keywords to the set
+  numbers=left,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,	                   % sets default tabsize to 2 spaces
+  title=\lstname                   % show the filename of files included with \lstinputlisting; also try caption instead of title
+}
+
+\author{2014011355 辛杭高}
+\title{音频转换实验 Part III}
+\begin{document}
+\maketitle
+本部分实验要求对两段音频的距离进行测定，由于在实验2中，我主要使用了频率特征来修改从A到B的语音信息，因此在本实验中，我给出的
+距离度量准则主要是基于基频和频率的。
+
+测试时运行src文件夹下的test.m文件即可，也可以直接在doc/result.txt中查看运行结果。注：本实验为了获取音频的基频信息使用了
+开源库fxrapt，其源代码在tools文件夹下。
+
+\section{基频之差}
+我们可以使用基频之差的绝对值作为基频，用公式表述为
+\begin{equation}
+dis =   \left| F_0(wav_1) - F_0(wav_2)  \right|
+\end{equation}
+
+具体代码参见meandis.m，调用该函数之前应该首先调用fxrapt来获取相应音频的基频。直接使用基频之差作为距离在有些情况下有些武断，
+对于这种度量方式来说，基频是一段音频最重要的特征，对于实验part2中男女音频转化类的实验会比较有用。
+
+在此距离度量下，郭德纲的音频与实验part1修改后的距离度量如下：
+
+\begin{tabular}{|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{距离} \\ \hline
+
+\makecell{改变基频} & \makecell{86.6426} \\ \hline
+
+\makecell{改变频率} & \makecell{9.1581} \\ \hline
+
+\makecell{改变时长} & \makecell{12.2042} \\ \hline
+\end{tabular}
+
+在此距离度量下，单田方的音频与实验part1修改后的距离度量如下：
+
+\begin{tabular}{|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{距离} \\ \hline
+
+\makecell{改变基频} & \makecell{77.8518} \\ \hline
+
+\makecell{改变频率} & \makecell{0.1616} \\ \hline
+
+\makecell{改变时长} & \makecell{11.5972} \\ \hline
+\end{tabular}
+
+在此距离下，A类音频与B类音频的距离，A\'类音频与B类音频的距离度量后如下：
+
+\begin{tabular}{|r|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{A与B} & \makecell{A\'与B}\\ \hline
+
+\makecell{sen6000} & \makecell{124.3862} & \makecell{22.8660}\\ \hline
+
+\makecell{sen6015} & \makecell{113.6207} & \makecell{20.5444}\\ \hline
+
+\makecell{sen6028} & \makecell{111.4070} & \makecell{33.0249}\\ \hline
+
+\makecell{sen6044} & \makecell{102.4995} & \makecell{13.7764}\\ \hline
+
+\makecell{sen6147} & \makecell{105.7581} & \makecell{29.6283}\\ \hline
+\end{tabular}
+
+从实验part1的数据来看，仅仅改变基频的情况下，距离相比于改变频率和改变时长的变化更大。在part1中，我们
+了解到时长和频率之间有密切的关系，从这一度量数据下，也可以反映出这一结论。
+
+在此距离度量下可以明显看出，A与A\'的距离明显小于A与B的距离，这主要是因为基频是本度量的唯一标准。因为
+从A转化到A\'后距离变小，所以更加接近于音频B。
+
+\section{基频概率分布之差}
+我们可以将原始的声音序列划分成多个子序列，并且统计各个子序列中基频出现的频率，再用频率的概率分布之差
+的欧式距离作为我们的度量准则。相对于直接使用基频度量来说，这种方式相当于将时域信息考虑了进来，所以从
+这个角度来说，这种距离度量更加客观一些。
+
+用公式表述为
+\begin{equation}
+dis =   \left \| P(F_0(wav_1)) - P(F_0(wav_2)) \right \|
+\end{equation}
+
+在此距离度量下，郭德纲的音频与实验part1修改后的距离度量如下：
+
+\begin{tabular}{|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{距离} \\ \hline
+
+\makecell{改变基频} & \makecell{0.2709} \\ \hline
+
+\makecell{改变频率} & \makecell{0.0390} \\ \hline
+
+\makecell{改变时长} & \makecell{0.0398} \\ \hline
+\end{tabular}
+
+在此距离度量下，单田方的音频与实验part1修改后的距离度量如下：
+
+\begin{tabular}{|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{距离} \\ \hline
+
+\makecell{改变基频} & \makecell{0.1936} \\ \hline
+
+\makecell{改变频率} & \makecell{0.0389} \\ \hline
+
+\makecell{改变时长} & \makecell{0.0403} \\ \hline
+\end{tabular}
+
+在此距离下，A类音频与B类音频的距离，A\'类音频与B类音频的距离度量后如下：
+
+\begin{tabular}{|r|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{A与B} & \makecell{A\'与B}\\ \hline
+
+\makecell{sen6000} & \makecell{0.5199} & \makecell{0.2281}\\ \hline
+
+\makecell{sen6015} & \makecell{0.5047} & \makecell{0.2206}\\ \hline
+
+\makecell{sen6028} & \makecell{0.4497} & \makecell{0.1914}\\ \hline
+
+\makecell{sen6044} & \makecell{0.5202} & \makecell{0.1648}\\ \hline
+
+\makecell{sen6147} & \makecell{0.4936} & \makecell{0.2692}\\ \hline
+\end{tabular}
+
+同于前一种度量方法，对于所有文件A类与B类的距离要大于A\'类与B类的距离，这可以解释为什么A\'更接近于
+B，但是从理论上来说，这种方法由于考虑到时长的因素，所以相较于第一种方式会更加科学一些。
+\section{fft下的频域差距}
+这种度量的思路是，首先将音频从时域转化到频域，然后再频域上度量两者的距离，由于我们并不是很关心声音的
+强度，所以在具体实现的时候，我对fft转化后的结果首先进行了归一化，用公式可以表述为
+
+\begin{equation}
+dis = \left \| fft(wav_1) - fft(wav_2) \right \|
+\end{equation}
+
+在此距离度量下，郭德纲的音频与实验part1修改后的距离度量如下：
+
+\begin{tabular}{|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{距离} \\ \hline
+
+\makecell{改变基频} & \makecell{163.0106} \\ \hline
+
+\makecell{改变频率} & \makecell{198.1963} \\ \hline
+
+\makecell{改变时长} & \makecell{142.2059} \\ \hline
+\end{tabular}
+
+在此距离度量下，单田方的音频与实验part1修改后的距离度量如下：
+
+\begin{tabular}{|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{距离} \\ \hline
+
+\makecell{改变基频} & \makecell{83.3480} \\ \hline
+
+\makecell{改变频率} & \makecell{154.2692} \\ \hline
+
+\makecell{改变时长} & \makecell{185.0048} \\ \hline
+\end{tabular}
+
+在此距离下，A类音频与B类音频的距离，A\'类音频与B类音频的距离度量后如下：
+
+\begin{tabular}{|r|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{A与B} & \makecell{A\'与B}\\ \hline
+
+\makecell{sen6000} & \makecell{48.3889} & \makecell{25.4606}\\ \hline
+
+\makecell{sen6015} & \makecell{117.7738} & \makecell{102.8801}\\ \hline
+
+\makecell{sen6028} & \makecell{71.4647} & \makecell{42.4653}\\ \hline
+
+\makecell{sen6044} & \makecell{70.9075} & \makecell{54.6097}\\ \hline
+
+\makecell{sen6147} & \makecell{77.4202} & \makecell{95.6550}\\ \hline
+\end{tabular}
+
+首先对于郭德纲和单田方的音频，在本度量下改变频率成为造成距离增大的最主要原因，这是因为fft本身就是对频域的表征。
+从A类声音到B类声音的转换来说，对于绝大多数情况还是可以保证，A与B的距离要大于A\'与B的距离，但对于sen6147来说，
+这个对比关系并不成立，将sen6147的频域图象绘制出以后发现，可以看出A\'的频域分布整体上更接近与B，但是出现了个别
+奇点，这些奇点导致最后度量的结果很大。
+
+\section{错误尝试--时间序列度量}
+还有一种比较直观的思路是直接在时域上对两段音频的距离进行度量，这种度量用公式可以表述为
+\begin{equation}
+dis = \left \| wav_1 - wav_2 \right \|
+\end{equation}
+
+显然在这种度量下，即使两段音频的频域信息十分类似，也可能在时域下距离很大。若将此度量准则用于A类语言与B类的比较，可以
+得到
+\begin{tabular}{|r|r|r|}
+\hline
+
+\makecell{待转化文件名} & \makecell{A与B} & \makecell{A\'与B}\\ \hline
+
+\makecell{sen6000} & \makecell{0.0372} & \makecell{0.0387}\\ \hline
+
+\makecell{sen6015} & \makecell{0.0125} & \makecell{0.0146}\\ \hline
+
+\makecell{sen6028} & \makecell{0.0184} & \makecell{0.0206}\\ \hline
+
+\makecell{sen6044} & \makecell{0.0154} & \makecell{0.0177}\\ \hline
+
+\makecell{sen6147} & \makecell{0.0106} & \makecell{0.0131}\\ \hline
+\end{tabular}
+此时，A与B的距离反而小于A\'与B的距离，这违反了人的直观听觉，这说明这种方法在此数据集上并不合适，虽然这种方法在时域
+上也是有其道理的。
+
+\section{声学参数与人主观听觉的关系}
+对于人的主观听觉来说，声音的内容非常重要，如果两个音频的内容不同，那度量的距离结果应该很大。但声音的频率与内容的关系
+不大，所以在基频与频率的度量下很难度量出内容的不同，所以对于音频内容的识别还需要考虑到时域的信息。最好首先对音频进行
+划分，音频被分为多个片段，如果每个片段只包含少数文字，再对各片段声音的频域差异进行度量，就可以在一定程度上反映两个
+音频之间内容上的关联程度。当然，这种判断方法仍有局限，一方面是因为文字与声音的频率并不是一一对应关系，另一方面频域除了
+后所读文字的影响，还会受到说话人的影响。
+
+从音色的角度来说，频域是度量音色的一个非常有效的指标，例如男女音色之间的差距，可以利用两者的频率进行度量，也可以通过
+频域上的调整将男音转化成女音。因此我们可以通过傅里叶变化，将声音从时域转化到频域，如果两个音波在频域下比较接近，那可以
+在一定程度上说明这两段音波的音色比较接近，尤其是针对男音和女音的辨识，有着很良好的效果。
+
+基频是基音的频率，决定了整个音的音高，会影响人类主观听觉对自然中声音的感知，十分适合作为距离度量时的主要参数。
+
+时长对应于音速特征，但是音速特征并不是独立的，改变时长会在一定程度上影响到频率，但改变时长依然是在改变音频的音色，而不是
+在改变音频的内容，只会使得音频变得更加低沉或者更加尖亮。
+
+若想改变音频的内容，通过改变基频，频率，时长等特性并不可行，若要改变音频的内容，必须要在小片段上改变其声学特征，从这个角度
+来说，若是用小波变换来对音频进行处理，会同时考虑到频域特征和时域特征，会与人的主观听觉产生高度重合，可以作为一个重要指标。
+\end{document}
+
