@@ -90,7 +90,7 @@ psnr = PSNR(img_gray, decode);
 disp(psnr);
 imwrite(recover_img, 'max_2D_reserve_0.25.png');
 
-coe = choose_first_coe(1/16, encode2);
+coe = choose_max_coe(1/16, encode2);
 decode = idct2(coe);
 recover_img = mat2gray(decode);
 psnr = PSNR(img_gray, decode);
